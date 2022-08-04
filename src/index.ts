@@ -158,6 +158,10 @@ async function fetchJsonFile(
     }
   }
 
+  const branch = github.context.ref.replace("refs/heads/", "");
+  await gitUtils.switchToMaybeExistingBranch(branch);
+  await gitUtils.reset(github.context.sha);
+
   const changesetBase = path.resolve(process.cwd(), ".changeset");
   await mkdirp(changesetBase).catch(() => null);
 
@@ -205,8 +209,6 @@ ${changeset.summary}
       `chore(dependencies): updated changesets for modified dependencies`
     );
   }
-
-  const branch = github.context.ref.replace("refs/heads/", "");
 
   await gitUtils.push(branch, {
     force: true,
