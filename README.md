@@ -1,3 +1,3 @@
-# renovate-changesets-action
+# changesets-dependencies-action
 
-A GitHub Action for create Changesets files for Renovate dependencies updated
+A GitHub Action for creating Changesets files for dependencies updates.

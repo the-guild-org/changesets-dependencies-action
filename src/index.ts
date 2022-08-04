@@ -4,6 +4,8 @@ import { setupGitCredentials, setupGitUser } from "./utils";
 import fetch from "node-fetch";
 import { getPackages } from "@manypkg/get-packages";
 import path from "path";
+import { PackageJSON } from "@changesets/types";
+import { diff } from "json-diff";
 
 async function fetchFile(
   pat: string,
@@ -87,16 +89,24 @@ async function fetchJsonFile(
   console.log("relevant packages:", relevantPackages);
 
   for (const pkg of relevantPackages) {
-    const oldPackageFile = await fetchJsonFile(githubToken!, {
+    const oldPackageFile = (await fetchJsonFile(githubToken!, {
       ...github.context.repo,
       path: pkg.relativePath,
       ref: baseSha,
-    });
+    })) as PackageJSON;
 
-    console.log({
-      prev: oldPackageFile,
-      current: pkg.packageJson,
-    });
+    if (oldPackageFile) {
+      const dependenciesDiff = diff(
+        oldPackageFile.dependencies || {},
+        pkg.packageJson.dependencies || {}
+      );
+
+      console.log(dependenciesDiff);
+    } else {
+      core.warning(
+        `Failed to locate previous file content of ${pkg.relativePath}, skipping ${pkg.packageJson.name}...`
+      );
+    }
   }
 
   // const { data: changes } = await octokit.rest.git.getTree({
