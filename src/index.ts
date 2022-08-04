@@ -158,8 +158,8 @@ async function fetchJsonFile(
     }
   }
 
-  await mkdirp(".changesets").catch(() => null);
   const changesetBase = path.resolve(process.cwd(), ".changeset");
+  await mkdirp(changesetBase).catch(() => null);
 
   for (const [key, value] of changes) {
     const changes = [
@@ -167,7 +167,10 @@ async function fetchJsonFile(
       ...value.peerDependencies.map((d) => textify(d, "peerDependencies")),
     ].map((t) => `- ${t}`);
 
-    console.log("summary", changes);
+    console.debug("package update summary", {
+      key,
+      changes,
+    });
 
     const changeset = {
       releases: [
@@ -179,8 +182,7 @@ async function fetchJsonFile(
       summary: changes.join("\n"),
     };
 
-    const changesetID = `${key}-dependencies`;
-    const filePath = path.resolve(changesetBase, `${changesetID}.md`);
+    const filePath = path.resolve(changesetBase, `${key}-dependencies.md`);
 
     const changesetContents = `---
     ${changeset.releases
@@ -189,7 +191,7 @@ async function fetchJsonFile(
     ---
     
     ${changeset.summary}
-      `;
+`;
 
     console.debug(`Writing changeset to ${filePath}`, changesetContents);
 

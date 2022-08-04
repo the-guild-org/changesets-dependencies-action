@@ -43861,14 +43861,17 @@ async function fetchJsonFile(pat, file) {
       );
     }
   }
-  await (0, import_fs_extra4.mkdirp)(".changesets").catch(() => null);
   const changesetBase = import_path3.default.resolve(process.cwd(), ".changeset");
+  await (0, import_fs_extra4.mkdirp)(changesetBase).catch(() => null);
   for (const [key, value] of changes) {
     const changes2 = [
       ...value.dependencies.map((d) => textify(d, "dependencies")),
       ...value.peerDependencies.map((d) => textify(d, "peerDependencies"))
     ].map((t2) => `- ${t2}`);
-    console.log("summary", changes2);
+    console.debug("package update summary", {
+      key,
+      changes: changes2
+    });
     const changeset = {
       releases: [
         {
@@ -43878,14 +43881,13 @@ async function fetchJsonFile(pat, file) {
       ],
       summary: changes2.join("\n")
     };
-    const changesetID = `${key}-dependencies`;
-    const filePath = import_path3.default.resolve(changesetBase, `${changesetID}.md`);
+    const filePath = import_path3.default.resolve(changesetBase, `${key}-dependencies.md`);
     const changesetContents = `---
     ${changeset.releases.map((release) => `"${release.name}": ${release.type}`).join("\n")}
     ---
     
     ${changeset.summary}
-      `;
+`;
     console.debug(`Writing changeset to ${filePath}`, changesetContents);
     await (0, import_fs_extra4.writeFile)(filePath, changesetContents);
   }
