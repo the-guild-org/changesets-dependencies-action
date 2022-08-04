@@ -7,7 +7,7 @@ import path from "path";
 import { PackageJSON } from "@changesets/types";
 import write from "@changesets/write";
 import { diff, IChange, Operation } from "json-diff-ts";
-import { read } from "@changesets/config";
+import { read, defaultConfig } from "@changesets/config";
 
 function textify(d: IChange, location: string) {
   const link = `([\`${d.key}\` @ \`${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
@@ -63,7 +63,7 @@ async function fetchJsonFile(
 }
 
 (async () => {
-  console.log("Git context:", JSON.stringify(github.context, null, 2));
+  // console.log("Git context:", JSON.stringify(github.context, null, 2));
   let githubToken = process.env.GITHUB_TOKEN;
 
   if (!githubToken) {
@@ -82,15 +82,14 @@ async function fetchJsonFile(
 
   const octokit = github.getOctokit(githubToken);
 
-  console.log("setting GitHub User");
+  console.debug("setting GitHub User");
   await setupGitUser();
-  console.log("setting GitHub credentials");
+  console.debug("setting GitHub credentials");
   await setupGitCredentials(githubToken);
 
   const issueContext = github.context.issue;
 
   if (!issueContext?.number) {
-    console.debug(github.context);
     core.warning(`Failed to locate a PR associated with the Action context:`);
     core.setFailed(`Failed to locate a PR associated with the Action context`);
 
@@ -98,7 +97,13 @@ async function fetchJsonFile(
   }
 
   const packages = await getPackages(process.cwd());
-  const changesetsConfig = await read(process.cwd(), packages);
+  const changesetsConfig = await read(process.cwd(), packages).catch((e) => {
+    console.warn(
+      `Failed to read changesets config: ${e.message}, using default config...`
+    );
+
+    return defaultConfig;
+  });
   const relevantPackages = packages.packages
     .filter(
       (pkg) =>
@@ -111,7 +116,7 @@ async function fetchJsonFile(
       relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
     }));
 
-  console.log("relevant packages:", relevantPackages);
+  // console.debug("relevant packages:", relevantPackages);
 
   const changes = new Map<
     string,
