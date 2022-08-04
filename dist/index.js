@@ -5297,8 +5297,8 @@ function fetchWrapper(requestOptions) {
   let headers = {};
   let status;
   let url;
-  const fetch3 = requestOptions.request && requestOptions.request.fetch || lib_default;
-  return fetch3(requestOptions.url, Object.assign(
+  const fetch4 = requestOptions.request && requestOptions.request.fetch || lib_default;
+  return fetch4(requestOptions.url, Object.assign(
     {
       method: requestOptions.method,
       body: requestOptions.body,
@@ -43745,8 +43745,8 @@ var import_fs_extra4 = __toESM(require_lib3());
 
 // src/gitUtils.ts
 var import_exec2 = __toESM(require_exec());
-var pullBranch = async (branch) => {
-  await (0, import_exec2.exec)("git", ["pull", "origin", "--rebase", branch]);
+var fetch3 = async () => {
+  await (0, import_exec2.exec)("git", ["fetch"]);
 };
 var push = async (branch, { force } = {}) => {
   await (0, import_exec2.exec)(
@@ -43760,13 +43760,7 @@ var push = async (branch, { force } = {}) => {
   );
 };
 var switchToMaybeExistingBranch = async (branch) => {
-  let { stderr } = await execWithOutput("git", ["checkout", branch], {
-    ignoreReturnCode: true
-  });
-  let isCreatingBranch = !stderr.toString().includes(`Switched to a new branch '${branch}'`);
-  if (isCreatingBranch) {
-    await (0, import_exec2.exec)("git", ["checkout", "-b", branch]);
-  }
+  await execWithOutput("git", ["checkout", "-t", `origin/${branch}`]);
 };
 var commitAll = async (message) => {
   await (0, import_exec2.exec)("git", ["add", "."]);
@@ -43877,8 +43871,8 @@ async function fetchJsonFile(pat, file) {
     }
   }
   const branch = github.context.payload.pull_request.head.ref;
+  await fetch3();
   await switchToMaybeExistingBranch(branch);
-  await pullBranch(branch);
   const changesetBase = import_path3.default.resolve(process.cwd(), ".changeset");
   await (0, import_fs_extra4.mkdirp)(changesetBase).catch(() => null);
   for (const [key, value] of changes) {
@@ -43915,8 +43909,8 @@ ${changeset.summary}
     await commitAll(
       `chore(dependencies): updated changesets for modified dependencies`
     );
+    await push();
   }
-  await push();
 })().catch((err) => {
   console.error(err);
   core.setFailed(err.message);

@@ -159,8 +159,8 @@ async function fetchJsonFile(
   }
 
   const branch = github.context.payload.pull_request!.head.ref;
+  await gitUtils.fetch();
   await gitUtils.switchToMaybeExistingBranch(branch);
-  await gitUtils.pullBranch(branch);
 
   const changesetBase = path.resolve(process.cwd(), ".changeset");
   await mkdirp(changesetBase).catch(() => null);
@@ -208,9 +208,8 @@ ${changeset.summary}
     await gitUtils.commitAll(
       `chore(dependencies): updated changesets for modified dependencies`
     );
+    await gitUtils.push();
   }
-
-  await gitUtils.push();
 })().catch((err) => {
   console.error(err);
   core.setFailed(err.message);

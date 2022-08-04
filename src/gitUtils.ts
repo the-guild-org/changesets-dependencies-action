@@ -10,8 +10,8 @@ export const setupUser = async () => {
   ]);
 };
 
-export const pullBranch = async (branch: string) => {
-  await exec("git", ["pull", "origin", "--rebase", branch]);
+export const fetch = async () => {
+  await exec("git", ["fetch"]);
 };
 
 export const push = async (
@@ -34,15 +34,7 @@ export const pushTags = async () => {
 };
 
 export const switchToMaybeExistingBranch = async (branch: string) => {
-  let { stderr } = await execWithOutput("git", ["checkout", branch], {
-    ignoreReturnCode: true,
-  });
-  let isCreatingBranch = !stderr
-    .toString()
-    .includes(`Switched to a new branch '${branch}'`);
-  if (isCreatingBranch) {
-    await exec("git", ["checkout", "-b", branch]);
-  }
+  await execWithOutput("git", ["checkout", "-t", `origin/${branch}`]);
 };
 
 export const reset = async (
