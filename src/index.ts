@@ -107,8 +107,8 @@ async function fetchJsonFile(
   const relevantPackages = packages.packages
     .filter(
       (pkg) =>
-        changesetsConfig.ignore.includes(pkg.packageJson.name) ||
-        pkg.packageJson.private
+        !changesetsConfig.ignore.includes(pkg.packageJson.name) &&
+        !pkg.packageJson.private
     )
     .map((p) => ({
       ...p,
@@ -116,7 +116,7 @@ async function fetchJsonFile(
       relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
     }));
 
-  // console.debug("relevant packages:", relevantPackages);
+  console.debug("relevant packages:", relevantPackages);
 
   const changes = new Map<
     string,
