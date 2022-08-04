@@ -43898,7 +43898,8 @@ ${changeset.summary}
       `chore(dependencies): updated changesets for modified dependencies`
     );
   }
-  await push(github.context.payload.pull_request.head.ref, {
+  const branch = github.context.ref.replace("refs/heads/", "");
+  await push(branch, {
     force: true
   });
 })().catch((err) => {

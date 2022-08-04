@@ -206,7 +206,9 @@ ${changeset.summary}
     );
   }
 
-  await gitUtils.push(github.context.payload.pull_request!.head.ref, {
+  const branch = github.context.ref.replace("refs/heads/", "");
+
+  await gitUtils.push(branch, {
     force: true,
   });
 })().catch((err) => {
