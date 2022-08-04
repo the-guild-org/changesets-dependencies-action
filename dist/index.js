@@ -15975,7 +15975,7 @@ var require_regeneratorRuntime = __commonJS({
         };
       }, exports2.values = values, Context.prototype = {
         constructor: Context,
-        reset: function reset2(skipTempReset) {
+        reset: function reset(skipTempReset) {
           if (this.prev = 0, this.next = 0, this.sent = this._sent = void 0, this.done = false, this.delegate = null, this.method = "next", this.arg = void 0, this.tryEntries.forEach(resetTryEntry), !skipTempReset)
             for (var name in this) {
               "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = void 0);
@@ -43762,9 +43762,6 @@ var switchToMaybeExistingBranch = async (branch) => {
     await (0, import_exec2.exec)("git", ["checkout", "-b", branch]);
   }
 };
-var reset = async (pathSpec, mode = "hard") => {
-  await (0, import_exec2.exec)("git", ["reset", `--${mode}`, pathSpec]);
-};
 var commitAll = async (message) => {
   await (0, import_exec2.exec)("git", ["add", "."]);
   await (0, import_exec2.exec)("git", ["commit", "-m", message]);
@@ -43873,9 +43870,8 @@ async function fetchJsonFile(pat, file) {
       );
     }
   }
-  const branch = github.context.ref.replace("refs/heads/", "");
+  const branch = github.context.payload.pull_request.head.ref;
   await switchToMaybeExistingBranch(branch);
-  await reset(github.context.sha);
   const changesetBase = import_path3.default.resolve(process.cwd(), ".changeset");
   await (0, import_fs_extra4.mkdirp)(changesetBase).catch(() => null);
   for (const [key, value] of changes) {

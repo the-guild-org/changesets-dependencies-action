@@ -158,9 +158,8 @@ async function fetchJsonFile(
     }
   }
 
-  const branch = github.context.ref.replace("refs/heads/", "");
+  const branch = github.context.payload.pull_request!.head.ref;
   await gitUtils.switchToMaybeExistingBranch(branch);
-  await gitUtils.reset(github.context.sha);
 
   const changesetBase = path.resolve(process.cwd(), ".changeset");
   await mkdirp(changesetBase).catch(() => null);
