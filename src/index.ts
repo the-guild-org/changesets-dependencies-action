@@ -71,6 +71,8 @@ async function fetchJsonFile(
     tree_sha: github.context.ref,
   });
 
+  console.log(`Changes files: `, changes.tree);
+
   const filesToScan = changes.tree
     .map((item) =>
       item.path && item.path.endsWith("/package.json") ? item.path : null
