@@ -5,7 +5,7 @@ import fetch from "node-fetch";
 import { getPackages } from "@manypkg/get-packages";
 import path from "path";
 import { PackageJSON } from "@changesets/types";
-import { diff } from "json-diff";
+import { diff } from "json-diff-ts";
 
 async function fetchFile(
   pat: string,
