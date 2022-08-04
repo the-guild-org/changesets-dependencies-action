@@ -5,7 +5,25 @@ import fetch from "node-fetch";
 import { getPackages } from "@manypkg/get-packages";
 import path from "path";
 import { PackageJSON } from "@changesets/types";
-import { diff, IChange } from "json-diff-ts";
+import write from "@changesets/write";
+import { diff, IChange, Operation } from "json-diff-ts";
+import { read } from "@changesets/config";
+
+function textify(d: IChange, location: string) {
+  const link = `([\`${d.key}\` @ \`${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
+
+  switch (d.type) {
+    case Operation.ADD: {
+      return `Added dependency ${link} (under \`${location}\`)`;
+    }
+    case Operation.UPDATE: {
+      return `Updated dependency ${link} (was \`${d.oldValue}\`, under \`${location}\`)`;
+    }
+    case Operation.REMOVE: {
+      return `Removed dependency ${link} (under \`${location}\`)`;
+    }
+  }
+}
 
 async function fetchFile(
   pat: string,
@@ -79,12 +97,19 @@ async function fetchJsonFile(
     return;
   }
 
-  const { packages } = await getPackages(process.cwd());
-  const relevantPackages = packages.map((p) => ({
-    ...p,
-    absolutePath: `${p.dir}/package.json`,
-    relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
-  }));
+  const packages = await getPackages(process.cwd());
+  const changesetsConfig = await read(process.cwd(), packages);
+  const relevantPackages = packages.packages
+    .filter(
+      (pkg) =>
+        changesetsConfig.ignore.includes(pkg.packageJson.name) ||
+        pkg.packageJson.private
+    )
+    .map((p) => ({
+      ...p,
+      absolutePath: `${p.dir}/package.json`,
+      relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
+    }));
 
   console.log("relevant packages:", relevantPackages);
 
@@ -127,10 +152,27 @@ async function fetchJsonFile(
   }
 
   for (const [key, value] of changes) {
-    console.log({
-      key,
-      value,
-    });
+    const changes = [
+      ...value.dependencies.map((d) => textify(d, "dependencies")),
+      ...value.peerDependencies.map((d) => textify(d, "peerDependencies")),
+    ].map((t) => `- ${t}`);
+
+    console.log("summary", changes);
+
+    const changeset = await write(
+      {
+        releases: [
+          {
+            name: key,
+            type: "patch",
+          },
+        ],
+        summary: changes.join("\n"),
+      },
+      process.cwd()
+    );
+
+    console.log(changeset);
   }
 
   // const { data: changes } = await octokit.rest.git.getTree({
