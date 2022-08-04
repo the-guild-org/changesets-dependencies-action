@@ -177,6 +177,10 @@ async function fetchJsonFile(
       changes,
     });
 
+    if (changes.length === 0) {
+      continue;
+    }
+
     const changeset = {
       releases: [
         {

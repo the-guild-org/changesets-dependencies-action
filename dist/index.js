@@ -43960,6 +43960,9 @@ async function fetchJsonFile(pat, file) {
       key,
       changes: changes2
     });
+    if (changes2.length === 0) {
+      continue;
+    }
     const changeset = {
       releases: [
         {
