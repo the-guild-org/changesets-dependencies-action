@@ -43745,6 +43745,9 @@ var import_fs_extra4 = __toESM(require_lib3());
 
 // src/gitUtils.ts
 var import_exec2 = __toESM(require_exec());
+var pullBranch = async (branch) => {
+  await (0, import_exec2.exec)("git", ["pull", "origin", branch]);
+};
 var push = async (branch, { force } = {}) => {
   await (0, import_exec2.exec)(
     "git",
@@ -43874,6 +43877,7 @@ async function fetchJsonFile(pat, file) {
     }
   }
   const branch = github.context.payload.pull_request.head.ref;
+  await pullBranch(branch);
   await switchToMaybeExistingBranch(branch);
   const changesetBase = import_path3.default.resolve(process.cwd(), ".changeset");
   await (0, import_fs_extra4.mkdirp)(changesetBase).catch(() => null);

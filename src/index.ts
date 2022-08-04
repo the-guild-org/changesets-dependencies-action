@@ -159,6 +159,7 @@ async function fetchJsonFile(
   }
 
   const branch = github.context.payload.pull_request!.head.ref;
+  await gitUtils.pullBranch(branch);
   await gitUtils.switchToMaybeExistingBranch(branch);
 
   const changesetBase = path.resolve(process.cwd(), ".changeset");
