@@ -8,9 +8,11 @@ import { PackageJSON } from "@changesets/types";
 import write from "@changesets/write";
 import { diff, IChange, Operation } from "json-diff-ts";
 import { read, defaultConfig } from "@changesets/config";
+import { mkdirp, writeFile } from "fs-extra";
+import * as gitUtils from "./gitUtils";
 
 function textify(d: IChange, location: string) {
-  const link = `([\`${d.key}\` @ \`${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
+  const link = `([\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
 
   switch (d.type) {
     case Operation.ADD: {
@@ -156,6 +158,9 @@ async function fetchJsonFile(
     }
   }
 
+  await mkdirp(".changesets").catch(() => null);
+  const changesetBase = path.resolve(process.cwd(), ".changeset");
+
   for (const [key, value] of changes) {
     const changes = [
       ...value.dependencies.map((d) => textify(d, "dependencies")),
@@ -164,74 +169,42 @@ async function fetchJsonFile(
 
     console.log("summary", changes);
 
-    const changeset = await write(
-      {
-        releases: [
-          {
-            name: key,
-            type: "patch",
-          },
-        ],
-        summary: changes.join("\n"),
-      },
-      process.cwd()
-    );
+    const changeset = {
+      releases: [
+        {
+          name: key,
+          type: "patch",
+        },
+      ],
+      summary: changes.join("\n"),
+    };
 
-    console.log(changeset);
+    const changesetID = `${key}-dependencies`;
+    const filePath = path.resolve(changesetBase, `${changesetID}.md`);
+
+    const changesetContents = `---
+    ${changeset.releases
+      .map((release) => `"${release.name}": ${release.type}`)
+      .join("\n")}
+    ---
+    
+    ${changeset.summary}
+      `;
+
+    console.debug(`Writing changeset to ${filePath}`, changesetContents);
+
+    await writeFile(filePath, changesetContents);
   }
 
-  // const { data: changes } = await octokit.rest.git.getTree({
-  //   ...github.context.repo,
-  //   recursive: "1",
-  //   tree_sha: github.context.ref,
-  // });
+  if (!(await gitUtils.checkIfClean())) {
+    await gitUtils.commitAll(
+      `chore(dependencies): updated changesets for modified dependencies`
+    );
+  }
 
-  // console.log(`Changes files: `, changes.tree);
-
-  // const filesToScan = changes.tree
-  //   .map((item) =>
-  //     item.path && item.path.endsWith("/package.json") ? item.path : null
-  //   )
-  //   .filter(Boolean);
-
-  // console.debug(
-  //   `Found total of ${filesToScan.length} changed package.json files to check:`,
-  //   filesToScan.join(", ")
-  // );
-
-  // if (filesToScan.length) {
-  //   const filesContent = await Promise.all(
-  //     filesToScan.map(async (filePath) => {
-  //       try {
-  //         const newPackageFile = await fetchJsonFile(githubToken!, {
-  //           owner: github.context.repo.owner,
-  //           repo: github.context.repo.repo,
-  //           path: filePath!,
-  //           ref: github.context.ref,
-  //         });
-
-  //         return {
-  //           filePath,
-  //           newPackageFile,
-  //         };
-  //         // const oldPackageFile = await fetchJsonFile(githubToken!, {
-  //         //   owner: github.context.repo.owner,
-  //         //   repo: github.context.repo.repo,
-  //         //   path: filePath!,
-  //         //   ref: github.context.payload.pull_request,
-  //         // });
-  //       } catch (e) {
-  //         console.warn(`Failed to fetch package.json file: ${filePath}`, e);
-
-  //         return null;
-  //       }
-  //     })
-  //   );
-
-  //   console.log(filesContent);
-  // } else {
-  //   core.info(`Failed to locate any package.json files to scan in the PR`);
-  // }
+  await gitUtils.push(github.context.payload.pull_request!.head.ref, {
+    force: true,
+  });
 })().catch((err) => {
   console.error(err);
   core.setFailed(err.message);
