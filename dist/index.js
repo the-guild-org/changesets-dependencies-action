@@ -43776,13 +43776,13 @@ function textify(d, location) {
   const link = `([\`${d.key}@${d.value}\` \u2197\uFE0E](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
   switch (d.type) {
     case import_json_diff_ts.Operation.ADD: {
-      return `Added dependency ${link} (under \`${location}\`)`;
+      return `Added dependency ${link} (to \`${location}\`)`;
     }
     case import_json_diff_ts.Operation.UPDATE: {
-      return `Updated dependency ${link} (was \`${d.oldValue}\`, under \`${location}\`)`;
+      return `Updated dependency ${link} (was \`${d.oldValue}\`, in \`${location}\`)`;
     }
     case import_json_diff_ts.Operation.REMOVE: {
-      return `Removed dependency ${link} (under \`${location}\`)`;
+      return `Removed dependency ${link} (from \`${location}\`)`;
     }
   }
 }

@@ -16,13 +16,13 @@ function textify(d: IChange, location: string) {
 
   switch (d.type) {
     case Operation.ADD: {
-      return `Added dependency ${link} (under \`${location}\`)`;
+      return `Added dependency ${link} (to \`${location}\`)`;
     }
     case Operation.UPDATE: {
-      return `Updated dependency ${link} (was \`${d.oldValue}\`, under \`${location}\`)`;
+      return `Updated dependency ${link} (was \`${d.oldValue}\`, in \`${location}\`)`;
     }
     case Operation.REMOVE: {
-      return `Removed dependency ${link} (under \`${location}\`)`;
+      return `Removed dependency ${link} (from \`${location}\`)`;
     }
   }
 }
