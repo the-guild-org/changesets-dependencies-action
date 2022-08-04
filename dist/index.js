@@ -9971,7 +9971,7 @@ var require_copy = __commonJS({
     var mkdirs = require_mkdirs().mkdirs;
     var pathExists = require_path_exists().pathExists;
     var utimesMillis = require_utimes().utimesMillis;
-    var stat2 = require_stat();
+    var stat3 = require_stat();
     function copy(src, dest, opts, cb) {
       if (typeof opts === "function" && !cb) {
         cb = opts;
@@ -9991,11 +9991,11 @@ var require_copy = __commonJS({
           "fs-extra-WARN0001"
         );
       }
-      stat2.checkPaths(src, dest, "copy", opts, (err, stats) => {
+      stat3.checkPaths(src, dest, "copy", opts, (err, stats) => {
         if (err)
           return cb(err);
         const { srcStat, destStat } = stats;
-        stat2.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
+        stat3.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
           if (err2)
             return cb(err2);
           if (opts.filter)
@@ -10031,8 +10031,8 @@ var require_copy = __commonJS({
       return getStats(destStat, src, dest, opts, cb);
     }
     function getStats(destStat, src, dest, opts, cb) {
-      const stat3 = opts.dereference ? fs4.stat : fs4.lstat;
-      stat3(src, (err, srcStat) => {
+      const stat4 = opts.dereference ? fs4.stat : fs4.lstat;
+      stat4(src, (err, srcStat) => {
         if (err)
           return cb(err);
         if (srcStat.isDirectory())
@@ -10139,7 +10139,7 @@ var require_copy = __commonJS({
     function copyDirItem(items, item, src, dest, opts, cb) {
       const srcItem = path4.join(src, item);
       const destItem = path4.join(dest, item);
-      stat2.checkPaths(srcItem, destItem, "copy", opts, (err, stats) => {
+      stat3.checkPaths(srcItem, destItem, "copy", opts, (err, stats) => {
         if (err)
           return cb(err);
         const { destStat } = stats;
@@ -10169,10 +10169,10 @@ var require_copy = __commonJS({
             if (opts.dereference) {
               resolvedDest = path4.resolve(process.cwd(), resolvedDest);
             }
-            if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
+            if (stat3.isSrcSubdir(resolvedSrc, resolvedDest)) {
               return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
             }
-            if (destStat.isDirectory() && stat2.isSrcSubdir(resolvedDest, resolvedSrc)) {
+            if (destStat.isDirectory() && stat3.isSrcSubdir(resolvedDest, resolvedSrc)) {
               return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
             }
             return copyLink(resolvedSrc, dest, cb);
@@ -10199,7 +10199,7 @@ var require_copy_sync = __commonJS({
     var path4 = require("path");
     var mkdirsSync = require_mkdirs().mkdirsSync;
     var utimesMillisSync = require_utimes().utimesMillisSync;
-    var stat2 = require_stat();
+    var stat3 = require_stat();
     function copySync(src, dest, opts) {
       if (typeof opts === "function") {
         opts = { filter: opts };
@@ -10214,8 +10214,8 @@ var require_copy_sync = __commonJS({
           "fs-extra-WARN0002"
         );
       }
-      const { srcStat, destStat } = stat2.checkPathsSync(src, dest, "copy", opts);
-      stat2.checkParentPathsSync(src, srcStat, dest, "copy");
+      const { srcStat, destStat } = stat3.checkPathsSync(src, dest, "copy", opts);
+      stat3.checkParentPathsSync(src, srcStat, dest, "copy");
       return handleFilterAndCopy(destStat, src, dest, opts);
     }
     function handleFilterAndCopy(destStat, src, dest, opts) {
@@ -10299,7 +10299,7 @@ var require_copy_sync = __commonJS({
     function copyDirItem(item, src, dest, opts) {
       const srcItem = path4.join(src, item);
       const destItem = path4.join(dest, item);
-      const { destStat } = stat2.checkPathsSync(srcItem, destItem, "copy", opts);
+      const { destStat } = stat3.checkPathsSync(srcItem, destItem, "copy", opts);
       return startCopy(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
@@ -10321,10 +10321,10 @@ var require_copy_sync = __commonJS({
         if (opts.dereference) {
           resolvedDest = path4.resolve(process.cwd(), resolvedDest);
         }
-        if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
+        if (stat3.isSrcSubdir(resolvedSrc, resolvedDest)) {
           throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
         }
-        if (fs4.statSync(dest).isDirectory() && stat2.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        if (fs4.statSync(dest).isDirectory() && stat3.isSrcSubdir(resolvedDest, resolvedSrc)) {
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
         return copyLink(resolvedSrc, dest);
@@ -11221,7 +11221,7 @@ var require_move = __commonJS({
     var remove = require_remove2().remove;
     var mkdirp2 = require_mkdirs().mkdirp;
     var pathExists = require_path_exists().pathExists;
-    var stat2 = require_stat();
+    var stat3 = require_stat();
     function move(src, dest, opts, cb) {
       if (typeof opts === "function") {
         cb = opts;
@@ -11229,11 +11229,11 @@ var require_move = __commonJS({
       }
       opts = opts || {};
       const overwrite = opts.overwrite || opts.clobber || false;
-      stat2.checkPaths(src, dest, "move", opts, (err, stats) => {
+      stat3.checkPaths(src, dest, "move", opts, (err, stats) => {
         if (err)
           return cb(err);
         const { srcStat, isChangingCase = false } = stats;
-        stat2.checkParentPaths(src, srcStat, dest, "move", (err2) => {
+        stat3.checkParentPaths(src, srcStat, dest, "move", (err2) => {
           if (err2)
             return cb(err2);
           if (isParentRoot(dest))
@@ -11302,12 +11302,12 @@ var require_move_sync = __commonJS({
     var copySync = require_copy2().copySync;
     var removeSync = require_remove2().removeSync;
     var mkdirpSync = require_mkdirs().mkdirpSync;
-    var stat2 = require_stat();
+    var stat3 = require_stat();
     function moveSync(src, dest, opts) {
       opts = opts || {};
       const overwrite = opts.overwrite || opts.clobber || false;
-      const { srcStat, isChangingCase = false } = stat2.checkPathsSync(src, dest, "move", opts);
-      stat2.checkParentPathsSync(src, srcStat, dest, "move");
+      const { srcStat, isChangingCase = false } = stat3.checkPathsSync(src, dest, "move", opts);
+      stat3.checkParentPathsSync(src, srcStat, dest, "move");
       if (!isParentRoot(dest))
         mkdirpSync(path4.dirname(dest));
       return doRename(src, dest, overwrite, isChangingCase);
@@ -16505,8 +16505,8 @@ var require_mkdirs2 = __commonJS({
             });
             break;
           default:
-            xfs.stat(p, (er2, stat2) => {
-              if (er2 || !stat2.isDirectory())
+            xfs.stat(p, (er2, stat3) => {
+              if (er2 || !stat3.isDirectory())
                 callback(er, made);
               else
                 callback(null, made);
@@ -16554,13 +16554,13 @@ var require_mkdirs_sync = __commonJS({
           made = mkdirsSync(path4.dirname(p), opts, made);
           mkdirsSync(p, opts, made);
         } else {
-          let stat2;
+          let stat3;
           try {
-            stat2 = xfs.statSync(p);
+            stat3 = xfs.statSync(p);
           } catch (err1) {
             throw err0;
           }
-          if (!stat2.isDirectory())
+          if (!stat3.isDirectory())
             throw err0;
         }
       }
@@ -16863,7 +16863,7 @@ var require_copy_sync2 = __commonJS({
     var path4 = require("path");
     var mkdirpSync = require_mkdirs3().mkdirsSync;
     var utimesSync = require_utimes2().utimesMillisSync;
-    var stat2 = require_stat2();
+    var stat3 = require_stat2();
     function copySync(src, dest, opts) {
       if (typeof opts === "function") {
         opts = { filter: opts };
@@ -16876,8 +16876,8 @@ var require_copy_sync2 = __commonJS({
 
     see https://github.com/jprichardson/node-fs-extra/issues/269`);
       }
-      const { srcStat, destStat } = stat2.checkPathsSync(src, dest, "copy");
-      stat2.checkParentPathsSync(src, srcStat, dest, "copy");
+      const { srcStat, destStat } = stat3.checkPathsSync(src, dest, "copy");
+      stat3.checkParentPathsSync(src, srcStat, dest, "copy");
       return handleFilterAndCopy(destStat, src, dest, opts);
     }
     function handleFilterAndCopy(destStat, src, dest, opts) {
@@ -16962,7 +16962,7 @@ var require_copy_sync2 = __commonJS({
     function copyDirItem(item, src, dest, opts) {
       const srcItem = path4.join(src, item);
       const destItem = path4.join(dest, item);
-      const { destStat } = stat2.checkPathsSync(srcItem, destItem, "copy");
+      const { destStat } = stat3.checkPathsSync(srcItem, destItem, "copy");
       return startCopy(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
@@ -16984,10 +16984,10 @@ var require_copy_sync2 = __commonJS({
         if (opts.dereference) {
           resolvedDest = path4.resolve(process.cwd(), resolvedDest);
         }
-        if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
+        if (stat3.isSrcSubdir(resolvedSrc, resolvedDest)) {
           throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
         }
-        if (fs4.statSync(dest).isDirectory() && stat2.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        if (fs4.statSync(dest).isDirectory() && stat3.isSrcSubdir(resolvedDest, resolvedSrc)) {
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
         return copyLink(resolvedSrc, dest);
@@ -17036,7 +17036,7 @@ var require_copy3 = __commonJS({
     var mkdirp2 = require_mkdirs3().mkdirs;
     var pathExists = require_path_exists2().pathExists;
     var utimes = require_utimes2().utimesMillis;
-    var stat2 = require_stat2();
+    var stat3 = require_stat2();
     function copy(src, dest, opts, cb) {
       if (typeof opts === "function" && !cb) {
         cb = opts;
@@ -17054,11 +17054,11 @@ var require_copy3 = __commonJS({
 
     see https://github.com/jprichardson/node-fs-extra/issues/269`);
       }
-      stat2.checkPaths(src, dest, "copy", (err, stats) => {
+      stat3.checkPaths(src, dest, "copy", (err, stats) => {
         if (err)
           return cb(err);
         const { srcStat, destStat } = stats;
-        stat2.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
+        stat3.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
           if (err2)
             return cb(err2);
           if (opts.filter)
@@ -17094,8 +17094,8 @@ var require_copy3 = __commonJS({
       return getStats(destStat, src, dest, opts, cb);
     }
     function getStats(destStat, src, dest, opts, cb) {
-      const stat3 = opts.dereference ? fs4.stat : fs4.lstat;
-      stat3(src, (err, srcStat) => {
+      const stat4 = opts.dereference ? fs4.stat : fs4.lstat;
+      stat4(src, (err, srcStat) => {
         if (err)
           return cb(err);
         if (srcStat.isDirectory())
@@ -17185,7 +17185,7 @@ var require_copy3 = __commonJS({
     function copyDirItem(items, item, src, dest, opts, cb) {
       const srcItem = path4.join(src, item);
       const destItem = path4.join(dest, item);
-      stat2.checkPaths(srcItem, destItem, "copy", (err, stats) => {
+      stat3.checkPaths(srcItem, destItem, "copy", (err, stats) => {
         if (err)
           return cb(err);
         const { destStat } = stats;
@@ -17215,10 +17215,10 @@ var require_copy3 = __commonJS({
             if (opts.dereference) {
               resolvedDest = path4.resolve(process.cwd(), resolvedDest);
             }
-            if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
+            if (stat3.isSrcSubdir(resolvedSrc, resolvedDest)) {
               return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
             }
-            if (destStat.isDirectory() && stat2.isSrcSubdir(resolvedDest, resolvedSrc)) {
+            if (destStat.isDirectory() && stat3.isSrcSubdir(resolvedDest, resolvedSrc)) {
               return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
             }
             return copyLink(resolvedSrc, dest, cb);
@@ -18101,12 +18101,12 @@ var require_move_sync2 = __commonJS({
     var copySync = require_copy_sync3().copySync;
     var removeSync = require_remove3().removeSync;
     var mkdirpSync = require_mkdirs3().mkdirpSync;
-    var stat2 = require_stat2();
+    var stat3 = require_stat2();
     function moveSync(src, dest, opts) {
       opts = opts || {};
       const overwrite = opts.overwrite || opts.clobber || false;
-      const { srcStat } = stat2.checkPathsSync(src, dest, "move");
-      stat2.checkParentPathsSync(src, srcStat, dest, "move");
+      const { srcStat } = stat3.checkPathsSync(src, dest, "move");
+      stat3.checkParentPathsSync(src, srcStat, dest, "move");
       mkdirpSync(path4.dirname(dest));
       return doRename(src, dest, overwrite);
     }
@@ -18160,18 +18160,18 @@ var require_move3 = __commonJS({
     var remove = require_remove3().remove;
     var mkdirp2 = require_mkdirs3().mkdirp;
     var pathExists = require_path_exists2().pathExists;
-    var stat2 = require_stat2();
+    var stat3 = require_stat2();
     function move(src, dest, opts, cb) {
       if (typeof opts === "function") {
         cb = opts;
         opts = {};
       }
       const overwrite = opts.overwrite || opts.clobber || false;
-      stat2.checkPaths(src, dest, "move", (err, stats) => {
+      stat3.checkPaths(src, dest, "move", (err, stats) => {
         if (err)
           return cb(err);
         const { srcStat } = stats;
-        stat2.checkParentPaths(src, srcStat, dest, "move", (err2) => {
+        stat3.checkParentPaths(src, srcStat, dest, "move", (err2) => {
           if (err2)
             return cb(err2);
           mkdirp2(path4.dirname(dest), (err3) => {
@@ -21595,7 +21595,7 @@ var require_async = __commonJS({
         if (!lstat.isSymbolicLink() || !settings.followSymbolicLink) {
           return callSuccessCallback(callback, lstat);
         }
-        settings.fs.stat(path4, (statError, stat2) => {
+        settings.fs.stat(path4, (statError, stat3) => {
           if (statError !== null) {
             if (settings.throwErrorOnBrokenSymbolicLink) {
               return callFailureCallback(callback, statError);
@@ -21603,9 +21603,9 @@ var require_async = __commonJS({
             return callSuccessCallback(callback, lstat);
           }
           if (settings.markSymbolicLink) {
-            stat2.isSymbolicLink = () => true;
+            stat3.isSymbolicLink = () => true;
           }
-          callSuccessCallback(callback, stat2);
+          callSuccessCallback(callback, stat3);
         });
       });
     }
@@ -21630,11 +21630,11 @@ var require_sync = __commonJS({
         return lstat;
       }
       try {
-        const stat2 = settings.fs.statSync(path4);
+        const stat3 = settings.fs.statSync(path4);
         if (settings.markSymbolicLink) {
-          stat2.isSymbolicLink = () => true;
+          stat3.isSymbolicLink = () => true;
         }
-        return stat2;
+        return stat3;
       } catch (error) {
         if (!settings.throwErrorOnBrokenSymbolicLink) {
           return lstat;
@@ -21699,13 +21699,13 @@ var require_out = __commonJS({
     var sync2 = require_sync();
     var settings_1 = require_settings();
     exports.Settings = settings_1.default;
-    function stat2(path4, optionsOrSettingsOrCallback, callback) {
+    function stat3(path4, optionsOrSettingsOrCallback, callback) {
       if (typeof optionsOrSettingsOrCallback === "function") {
         return async.read(path4, getSettings(), optionsOrSettingsOrCallback);
       }
       async.read(path4, getSettings(optionsOrSettingsOrCallback), callback);
     }
-    exports.stat = stat2;
+    exports.stat = stat3;
     function statSync2(path4, optionsOrSettings) {
       const settings = getSettings(optionsOrSettings);
       return sync2.read(path4, settings);
@@ -23874,13 +23874,13 @@ var require_globby = __commonJS({
       if (!options.cwd) {
         return;
       }
-      let stat2;
+      let stat3;
       try {
-        stat2 = fs4.statSync(options.cwd);
+        stat3 = fs4.statSync(options.cwd);
       } catch {
         return;
       }
-      if (!stat2.isDirectory()) {
+      if (!stat3.isDirectory()) {
         throw new Error("The `cwd` option must be a path to a directory");
       }
     };
@@ -28126,7 +28126,7 @@ var require_locate_path = __commonJS({
       }
       throw new Error(`Invalid type specified: ${type}`);
     }
-    var matchType = (type, stat2) => type === void 0 || stat2[typeMappings[type]]();
+    var matchType = (type, stat3) => type === void 0 || stat3[typeMappings[type]]();
     module2.exports = async (paths, options) => {
       options = {
         cwd: process.cwd(),
@@ -28138,8 +28138,8 @@ var require_locate_path = __commonJS({
       const statFn = options.allowSymlinks ? fsStat : fsLStat;
       return pLocate(paths, async (path_) => {
         try {
-          const stat2 = await statFn(path4.resolve(options.cwd, path_));
-          return matchType(options.type, stat2);
+          const stat3 = await statFn(path4.resolve(options.cwd, path_));
+          return matchType(options.type, stat3);
         } catch (_) {
           return false;
         }
@@ -28156,8 +28156,8 @@ var require_locate_path = __commonJS({
       const statFn = options.allowSymlinks ? fs4.statSync : fs4.lstatSync;
       for (const path_ of paths) {
         try {
-          const stat2 = statFn(path4.resolve(options.cwd, path_));
-          if (matchType(options.type, stat2)) {
+          const stat3 = statFn(path4.resolve(options.cwd, path_));
+          if (matchType(options.type, stat3)) {
             return path_;
           }
         } catch (_) {
@@ -28423,8 +28423,8 @@ var require_mkdirs4 = __commonJS({
             });
             break;
           default:
-            xfs.stat(p, (er2, stat2) => {
-              if (er2 || !stat2.isDirectory())
+            xfs.stat(p, (er2, stat3) => {
+              if (er2 || !stat3.isDirectory())
                 callback(er, made);
               else
                 callback(null, made);
@@ -28472,13 +28472,13 @@ var require_mkdirs_sync2 = __commonJS({
           made = mkdirsSync(path4.dirname(p), opts, made);
           mkdirsSync(p, opts, made);
         } else {
-          let stat2;
+          let stat3;
           try {
-            stat2 = xfs.statSync(p);
+            stat3 = xfs.statSync(p);
           } catch (err1) {
             throw err0;
           }
-          if (!stat2.isDirectory())
+          if (!stat3.isDirectory())
             throw err0;
         }
       }
@@ -28781,7 +28781,7 @@ var require_copy_sync4 = __commonJS({
     var path4 = require("path");
     var mkdirpSync = require_mkdirs5().mkdirsSync;
     var utimesSync = require_utimes3().utimesMillisSync;
-    var stat2 = require_stat3();
+    var stat3 = require_stat3();
     function copySync(src, dest, opts) {
       if (typeof opts === "function") {
         opts = { filter: opts };
@@ -28794,8 +28794,8 @@ var require_copy_sync4 = __commonJS({
 
     see https://github.com/jprichardson/node-fs-extra/issues/269`);
       }
-      const { srcStat, destStat } = stat2.checkPathsSync(src, dest, "copy");
-      stat2.checkParentPathsSync(src, srcStat, dest, "copy");
+      const { srcStat, destStat } = stat3.checkPathsSync(src, dest, "copy");
+      stat3.checkParentPathsSync(src, srcStat, dest, "copy");
       return handleFilterAndCopy(destStat, src, dest, opts);
     }
     function handleFilterAndCopy(destStat, src, dest, opts) {
@@ -28880,7 +28880,7 @@ var require_copy_sync4 = __commonJS({
     function copyDirItem(item, src, dest, opts) {
       const srcItem = path4.join(src, item);
       const destItem = path4.join(dest, item);
-      const { destStat } = stat2.checkPathsSync(srcItem, destItem, "copy");
+      const { destStat } = stat3.checkPathsSync(srcItem, destItem, "copy");
       return startCopy(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
@@ -28902,10 +28902,10 @@ var require_copy_sync4 = __commonJS({
         if (opts.dereference) {
           resolvedDest = path4.resolve(process.cwd(), resolvedDest);
         }
-        if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
+        if (stat3.isSrcSubdir(resolvedSrc, resolvedDest)) {
           throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
         }
-        if (fs4.statSync(dest).isDirectory() && stat2.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        if (fs4.statSync(dest).isDirectory() && stat3.isSrcSubdir(resolvedDest, resolvedSrc)) {
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
         return copyLink(resolvedSrc, dest);
@@ -28954,7 +28954,7 @@ var require_copy5 = __commonJS({
     var mkdirp2 = require_mkdirs5().mkdirs;
     var pathExists = require_path_exists4().pathExists;
     var utimes = require_utimes3().utimesMillis;
-    var stat2 = require_stat3();
+    var stat3 = require_stat3();
     function copy(src, dest, opts, cb) {
       if (typeof opts === "function" && !cb) {
         cb = opts;
@@ -28972,11 +28972,11 @@ var require_copy5 = __commonJS({
 
     see https://github.com/jprichardson/node-fs-extra/issues/269`);
       }
-      stat2.checkPaths(src, dest, "copy", (err, stats) => {
+      stat3.checkPaths(src, dest, "copy", (err, stats) => {
         if (err)
           return cb(err);
         const { srcStat, destStat } = stats;
-        stat2.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
+        stat3.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
           if (err2)
             return cb(err2);
           if (opts.filter)
@@ -29012,8 +29012,8 @@ var require_copy5 = __commonJS({
       return getStats(destStat, src, dest, opts, cb);
     }
     function getStats(destStat, src, dest, opts, cb) {
-      const stat3 = opts.dereference ? fs4.stat : fs4.lstat;
-      stat3(src, (err, srcStat) => {
+      const stat4 = opts.dereference ? fs4.stat : fs4.lstat;
+      stat4(src, (err, srcStat) => {
         if (err)
           return cb(err);
         if (srcStat.isDirectory())
@@ -29103,7 +29103,7 @@ var require_copy5 = __commonJS({
     function copyDirItem(items, item, src, dest, opts, cb) {
       const srcItem = path4.join(src, item);
       const destItem = path4.join(dest, item);
-      stat2.checkPaths(srcItem, destItem, "copy", (err, stats) => {
+      stat3.checkPaths(srcItem, destItem, "copy", (err, stats) => {
         if (err)
           return cb(err);
         const { destStat } = stats;
@@ -29133,10 +29133,10 @@ var require_copy5 = __commonJS({
             if (opts.dereference) {
               resolvedDest = path4.resolve(process.cwd(), resolvedDest);
             }
-            if (stat2.isSrcSubdir(resolvedSrc, resolvedDest)) {
+            if (stat3.isSrcSubdir(resolvedSrc, resolvedDest)) {
               return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
             }
-            if (destStat.isDirectory() && stat2.isSrcSubdir(resolvedDest, resolvedSrc)) {
+            if (destStat.isDirectory() && stat3.isSrcSubdir(resolvedDest, resolvedSrc)) {
               return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
             }
             return copyLink(resolvedSrc, dest, cb);
@@ -29902,12 +29902,12 @@ var require_move_sync4 = __commonJS({
     var copySync = require_copy_sync5().copySync;
     var removeSync = require_remove4().removeSync;
     var mkdirpSync = require_mkdirs5().mkdirpSync;
-    var stat2 = require_stat3();
+    var stat3 = require_stat3();
     function moveSync(src, dest, opts) {
       opts = opts || {};
       const overwrite = opts.overwrite || opts.clobber || false;
-      const { srcStat } = stat2.checkPathsSync(src, dest, "move");
-      stat2.checkParentPathsSync(src, srcStat, dest, "move");
+      const { srcStat } = stat3.checkPathsSync(src, dest, "move");
+      stat3.checkParentPathsSync(src, srcStat, dest, "move");
       mkdirpSync(path4.dirname(dest));
       return doRename(src, dest, overwrite);
     }
@@ -29961,18 +29961,18 @@ var require_move5 = __commonJS({
     var remove = require_remove4().remove;
     var mkdirp2 = require_mkdirs5().mkdirp;
     var pathExists = require_path_exists4().pathExists;
-    var stat2 = require_stat3();
+    var stat3 = require_stat3();
     function move(src, dest, opts, cb) {
       if (typeof opts === "function") {
         cb = opts;
         opts = {};
       }
       const overwrite = opts.overwrite || opts.clobber || false;
-      stat2.checkPaths(src, dest, "move", (err, stats) => {
+      stat3.checkPaths(src, dest, "move", (err, stats) => {
         if (err)
           return cb(err);
         const { srcStat } = stats;
-        stat2.checkParentPaths(src, srcStat, dest, "move", (err2) => {
+        stat3.checkParentPaths(src, srcStat, dest, "move", (err2) => {
           if (err2)
             return cb(err2);
           mkdirp2(path4.dirname(dest), (err3) => {
@@ -37840,8 +37840,8 @@ var require_mkdirs6 = __commonJS({
             });
             break;
           default:
-            xfs.stat(p, (er2, stat2) => {
-              if (er2 || !stat2.isDirectory())
+            xfs.stat(p, (er2, stat3) => {
+              if (er2 || !stat3.isDirectory())
                 callback(er, made);
               else
                 callback(null, made);
@@ -37889,13 +37889,13 @@ var require_mkdirs_sync3 = __commonJS({
           made = mkdirsSync(path4.dirname(p), opts, made);
           mkdirsSync(p, opts, made);
         } else {
-          let stat2;
+          let stat3;
           try {
-            stat2 = xfs.statSync(p);
+            stat3 = xfs.statSync(p);
           } catch (err1) {
             throw err0;
           }
-          if (!stat2.isDirectory())
+          if (!stat3.isDirectory())
             throw err0;
         }
       }
@@ -38279,8 +38279,8 @@ var require_copy7 = __commonJS({
       return getStats(destStat, src, dest, opts, cb);
     }
     function getStats(destStat, src, dest, opts, cb) {
-      const stat2 = opts.dereference ? fs4.stat : fs4.lstat;
-      stat2(src, (err, srcStat) => {
+      const stat3 = opts.dereference ? fs4.stat : fs4.lstat;
+      stat3(src, (err, srcStat) => {
         if (err)
           return cb(err);
         if (srcStat.isDirectory())
@@ -39241,8 +39241,8 @@ var require_move_sync6 = __commonJS({
       }
     }
     function moveSyncAcrossDevice(src, dest, overwrite) {
-      const stat2 = fs4.statSync(src);
-      if (stat2.isDirectory()) {
+      const stat3 = fs4.statSync(src);
+      if (stat3.isDirectory()) {
         return moveDirSyncAcrossDevice(src, dest, overwrite);
       } else {
         return moveFileSyncAcrossDevice(src, dest, overwrite);
@@ -39253,10 +39253,10 @@ var require_move_sync6 = __commonJS({
       const _buff = buffer(BUF_LENGTH);
       const flags = overwrite ? "w" : "wx";
       const fdr = fs4.openSync(src, "r");
-      const stat2 = fs4.fstatSync(fdr);
-      const fdw = fs4.openSync(dest, flags, stat2.mode);
+      const stat3 = fs4.fstatSync(fdr);
+      const fdw = fs4.openSync(dest, flags, stat3.mode);
       let pos = 0;
-      while (pos < stat2.size) {
+      while (pos < stat3.size) {
         const bytesRead = fs4.readSync(fdr, _buff, 0, BUF_LENGTH, pos);
         fs4.writeSync(fdw, _buff, 0, bytesRead);
         pos += bytesRead;
@@ -43960,7 +43960,18 @@ async function fetchJsonFile(pat, file) {
       key,
       changes: changes2
     });
+    const cleanName = (0, import_sanitize_filename.default)(key, {
+      replacement: "_"
+    });
+    const filePath = import_path3.default.resolve(
+      changesetBase,
+      `${cleanName}-dependencies.md`
+    );
     if (changes2.length === 0) {
+      const stats = await (0, import_fs_extra4.stat)(filePath).catch(() => null);
+      if (stats && stats.isFile()) {
+        await (0, import_fs_extra4.unlink)(filePath);
+      }
       continue;
     }
     const changeset = {
@@ -43972,13 +43983,6 @@ async function fetchJsonFile(pat, file) {
       ],
       summary: changes2.join("\n")
     };
-    const cleanName = (0, import_sanitize_filename.default)(key, {
-      replacement: "_"
-    });
-    const filePath = import_path3.default.resolve(
-      changesetBase,
-      `${cleanName}-dependencies.md`
-    );
     const changesetContents = `---
 ${changeset.releases.map((release) => `"${release.name}": ${release.type}`).join("\n")}
 ---

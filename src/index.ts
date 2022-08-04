@@ -5,10 +5,9 @@ import fetch from "node-fetch";
 import { getPackages } from "@manypkg/get-packages";
 import path from "path";
 import { PackageJSON } from "@changesets/types";
-import write from "@changesets/write";
 import { diff, IChange, Operation } from "json-diff-ts";
 import { read, defaultConfig } from "@changesets/config";
-import { mkdirp, writeFile } from "fs-extra";
+import { stat, mkdirp, writeFile, unlink } from "fs-extra";
 import * as gitUtils from "./gitUtils";
 import sanitize from "sanitize-filename";
 
@@ -177,7 +176,21 @@ async function fetchJsonFile(
       changes,
     });
 
+    const cleanName = sanitize(key, {
+      replacement: "_",
+    });
+    const filePath = path.resolve(
+      changesetBase,
+      `${cleanName}-dependencies.md`
+    );
+
     if (changes.length === 0) {
+      const stats = await stat(filePath).catch(() => null);
+
+      if (stats && stats.isFile()) {
+        await unlink(filePath);
+      }
+
       continue;
     }
 
@@ -190,14 +203,6 @@ async function fetchJsonFile(
       ],
       summary: changes.join("\n"),
     };
-
-    const cleanName = sanitize(key, {
-      replacement: "_",
-    });
-    const filePath = path.resolve(
-      changesetBase,
-      `${cleanName}-dependencies.md`
-    );
 
     const changesetContents = `---
 ${changeset.releases
