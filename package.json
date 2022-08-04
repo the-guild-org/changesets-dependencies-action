@@ -1,0 +1,20 @@
+{
+  "name": "@theguild/renovate-changesets-action",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/fs-extra": "9.0.13",
+    "@types/node": "18.6.3",
+    "prettier": "2.7.1",
+    "tsup": "6.2.1",
+    "typescript": "4.7.4",
+    "@actions/core": "1.9.0",
+    "@actions/exec": "1.1.1",
+    "@actions/github": "5.0.3",
+    "fs-extra": "10.1.0"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs"
+  }
+}

@@ -1,0 +1,8 @@
+name: RenovateChangesets
+description: A GitHub action to automate Changesets creation based on Renovate PRs
+runs:
+  using: "node16"
+  main: "dist/index.js"
+branding:
+  icon: "package"
+  color: "blue"
