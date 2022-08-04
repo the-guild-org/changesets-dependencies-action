@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import { setupGitCredentials, setupGitUser } from "./utils";
 import fetch from "node-fetch";
 import { getPackages } from "@manypkg/get-packages";
+import path from "path";
 
 async function fetchFile(
   pat: string,
@@ -66,9 +67,14 @@ async function fetchJsonFile(
     return;
   }
 
-  const packages = await getPackages(process.cwd());
+  const { packages } = await getPackages(process.cwd());
+  const relevantPaths = packages.map((p) => ({
+    ...p,
+    absolutePath: `${p}/package.json`,
+    relativePath: path.relative(process.cwd(), `${p}/package.json`),
+  }));
 
-  console.log("Packages found:", packages);
+  console.log("relevant:", relevantPaths);
 
   const { data: changes } = await octokit.rest.git.getTree({
     ...github.context.repo,
