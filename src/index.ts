@@ -10,6 +10,7 @@ import { diff, IChange, Operation } from "json-diff-ts";
 import { read, defaultConfig } from "@changesets/config";
 import { mkdirp, writeFile } from "fs-extra";
 import * as gitUtils from "./gitUtils";
+import sanitize from "sanitize-filename";
 
 function textify(d: IChange, location: string) {
   const link = `([\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
@@ -186,7 +187,13 @@ async function fetchJsonFile(
       summary: changes.join("\n"),
     };
 
-    const filePath = path.resolve(changesetBase, `${key}-dependencies.md`);
+    const cleanName = sanitize(key, {
+      replacement: "_",
+    });
+    const filePath = path.resolve(
+      changesetBase,
+      `${cleanName}-dependencies.md`
+    );
 
     const changesetContents = `---
 ${changeset.releases

@@ -42110,6 +42110,81 @@ var require_semver = __commonJS({
   }
 });
 
+// node_modules/truncate-utf8-bytes/lib/truncate.js
+var require_truncate = __commonJS({
+  "node_modules/truncate-utf8-bytes/lib/truncate.js"(exports, module2) {
+    "use strict";
+    function isHighSurrogate(codePoint) {
+      return codePoint >= 55296 && codePoint <= 56319;
+    }
+    function isLowSurrogate(codePoint) {
+      return codePoint >= 56320 && codePoint <= 57343;
+    }
+    module2.exports = function truncate(getLength, string, byteLength) {
+      if (typeof string !== "string") {
+        throw new Error("Input must be string");
+      }
+      var charLength = string.length;
+      var curByteLength = 0;
+      var codePoint;
+      var segment;
+      for (var i2 = 0; i2 < charLength; i2 += 1) {
+        codePoint = string.charCodeAt(i2);
+        segment = string[i2];
+        if (isHighSurrogate(codePoint) && isLowSurrogate(string.charCodeAt(i2 + 1))) {
+          i2 += 1;
+          segment += string[i2];
+        }
+        curByteLength += getLength(segment);
+        if (curByteLength === byteLength) {
+          return string.slice(0, i2 + 1);
+        } else if (curByteLength > byteLength) {
+          return string.slice(0, i2 - segment.length + 1);
+        }
+      }
+      return string;
+    };
+  }
+});
+
+// node_modules/truncate-utf8-bytes/index.js
+var require_truncate_utf8_bytes = __commonJS({
+  "node_modules/truncate-utf8-bytes/index.js"(exports, module2) {
+    "use strict";
+    var truncate = require_truncate();
+    var getLength = Buffer.byteLength.bind(Buffer);
+    module2.exports = truncate.bind(null, getLength);
+  }
+});
+
+// node_modules/sanitize-filename/index.js
+var require_sanitize_filename = __commonJS({
+  "node_modules/sanitize-filename/index.js"(exports, module2) {
+    "use strict";
+    var truncate = require_truncate_utf8_bytes();
+    var illegalRe = /[\/\?<>\\:\*\|"]/g;
+    var controlRe = /[\x00-\x1f\x80-\x9f]/g;
+    var reservedRe = /^\.+$/;
+    var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+    var windowsTrailingRe = /[\. ]+$/;
+    function sanitize2(input, replacement) {
+      if (typeof input !== "string") {
+        throw new Error("Input must be string");
+      }
+      var sanitized = input.replace(illegalRe, replacement).replace(controlRe, replacement).replace(reservedRe, replacement).replace(windowsReservedRe, replacement).replace(windowsTrailingRe, replacement);
+      return truncate(sanitized, 255);
+    }
+    module2.exports = function(input, options) {
+      var replacement = options && options.replacement || "";
+      var output = sanitize2(input, replacement);
+      if (replacement === "") {
+        return output;
+      }
+      return sanitize2(output, "");
+    };
+  }
+});
+
 // src/index.ts
 var core = __toESM(require_core());
 var github = __toESM(require_github());
@@ -43772,6 +43847,7 @@ var checkIfClean = async () => {
 };
 
 // src/index.ts
+var import_sanitize_filename = __toESM(require_sanitize_filename());
 function textify(d, location) {
   const link = `([\`${d.key}@${d.value}\` \u2197\uFE0E](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
   switch (d.type) {
@@ -43893,7 +43969,13 @@ async function fetchJsonFile(pat, file) {
       ],
       summary: changes2.join("\n")
     };
-    const filePath = import_path3.default.resolve(changesetBase, `${key}-dependencies.md`);
+    const cleanName = (0, import_sanitize_filename.default)(key, {
+      replacement: "_"
+    });
+    const filePath = import_path3.default.resolve(
+      changesetBase,
+      `${cleanName}-dependencies.md`
+    );
     const changesetContents = `---
 ${changeset.releases.map((release) => `"${release.name}": ${release.type}`).join("\n")}
 ---
