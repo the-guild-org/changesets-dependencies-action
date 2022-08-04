@@ -8,18 +8,19 @@
     "@actions/exec": "1.1.1",
     "@actions/github": "5.0.3",
     "@manypkg/get-packages": "1.1.3",
+    "@swc/core": "^1.2.223",
     "@types/fs-extra": "9.0.13",
+    "@types/json-diff": "0.7.0",
     "@types/node": "18.6.3",
     "fs-extra": "10.1.0",
+    "json-diff": "0.9.0",
     "node-fetch": "3.2.10",
     "prettier": "2.7.1",
     "tsup": "6.2.1",
-    "typescript": "4.7.4",
-    "@types/json-diff": "0.7.0",
-    "json-diff": "0.9.0"
+    "typescript": "4.7.4"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs"
+    "build": "tsup src/index.ts --format cjs --target es5"
   },
   "dependencies": {}
 }
