@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { setupGitCredentials, setupGitUser } from "./utils";
 import fetch from "node-fetch";
+import { getPackages } from "@manypkg/get-packages";
 
 async function fetchFile(
   pat: string,
@@ -64,6 +65,10 @@ async function fetchJsonFile(
 
     return;
   }
+
+  const packages = await getPackages(process.cwd());
+
+  console.log("Packages found:", packages);
 
   const { data: changes } = await octokit.rest.git.getTree({
     ...github.context.repo,
