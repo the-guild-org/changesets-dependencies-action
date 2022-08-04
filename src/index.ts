@@ -43,6 +43,7 @@ async function fetchJsonFile(
 }
 
 (async () => {
+  console.log("Git context:", JSON.stringify(github.context, null, 2));
   let githubToken = process.env.GITHUB_TOKEN;
 
   if (!githubToken) {
@@ -68,66 +69,75 @@ async function fetchJsonFile(
   }
 
   const { packages } = await getPackages(process.cwd());
-  const relevantPaths = packages.map((p) => ({
+  const relevantPackages = packages.map((p) => ({
     ...p,
     absolutePath: `${p.dir}/package.json`,
     relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
   }));
 
-  console.log("relevant:", relevantPaths);
+  console.log("relevant packages:", relevantPackages);
 
-  const { data: changes } = await octokit.rest.git.getTree({
-    ...github.context.repo,
-    recursive: "1",
-    tree_sha: github.context.ref,
-  });
+  // for (const package of relevantPackages) {
+  //   const oldPackageFile = await fetchJsonFile(githubToken!, {
+  //     owner: github.context.repo.owner,
+  //     repo: github.context.repo.repo,
+  //     path: filePath!,
+  //     ref: github.context.payload.pull_request,
+  //   });
+  // }
 
-  console.log(`Changes files: `, changes.tree);
+  // const { data: changes } = await octokit.rest.git.getTree({
+  //   ...github.context.repo,
+  //   recursive: "1",
+  //   tree_sha: github.context.ref,
+  // });
 
-  const filesToScan = changes.tree
-    .map((item) =>
-      item.path && item.path.endsWith("/package.json") ? item.path : null
-    )
-    .filter(Boolean);
+  // console.log(`Changes files: `, changes.tree);
 
-  console.debug(
-    `Found total of ${filesToScan.length} changed package.json files to check:`,
-    filesToScan.join(", ")
-  );
+  // const filesToScan = changes.tree
+  //   .map((item) =>
+  //     item.path && item.path.endsWith("/package.json") ? item.path : null
+  //   )
+  //   .filter(Boolean);
 
-  if (filesToScan.length) {
-    const filesContent = await Promise.all(
-      filesToScan.map(async (filePath) => {
-        try {
-          const newPackageFile = await fetchJsonFile(githubToken!, {
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            path: filePath!,
-            ref: github.context.ref,
-          });
+  // console.debug(
+  //   `Found total of ${filesToScan.length} changed package.json files to check:`,
+  //   filesToScan.join(", ")
+  // );
 
-          return {
-            filePath,
-            newPackageFile,
-          };
-          // const oldPackageFile = await fetchJsonFile(githubToken!, {
-          //   owner: github.context.repo.owner,
-          //   repo: github.context.repo.repo,
-          //   path: filePath!,
-          //   ref: github.context.payload.pull_request,
-          // });
-        } catch (e) {
-          console.warn(`Failed to fetch package.json file: ${filePath}`, e);
+  // if (filesToScan.length) {
+  //   const filesContent = await Promise.all(
+  //     filesToScan.map(async (filePath) => {
+  //       try {
+  //         const newPackageFile = await fetchJsonFile(githubToken!, {
+  //           owner: github.context.repo.owner,
+  //           repo: github.context.repo.repo,
+  //           path: filePath!,
+  //           ref: github.context.ref,
+  //         });
 
-          return null;
-        }
-      })
-    );
+  //         return {
+  //           filePath,
+  //           newPackageFile,
+  //         };
+  //         // const oldPackageFile = await fetchJsonFile(githubToken!, {
+  //         //   owner: github.context.repo.owner,
+  //         //   repo: github.context.repo.repo,
+  //         //   path: filePath!,
+  //         //   ref: github.context.payload.pull_request,
+  //         // });
+  //       } catch (e) {
+  //         console.warn(`Failed to fetch package.json file: ${filePath}`, e);
 
-    console.log(filesContent);
-  } else {
-    core.info(`Failed to locate any package.json files to scan in the PR`);
-  }
+  //         return null;
+  //       }
+  //     })
+  //   );
+
+  //   console.log(filesContent);
+  // } else {
+  //   core.info(`Failed to locate any package.json files to scan in the PR`);
+  // }
 })().catch((err) => {
   console.error(err);
   core.setFailed(err.message);
