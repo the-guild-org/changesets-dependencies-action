@@ -51,6 +51,15 @@ async function fetchJsonFile(
     return;
   }
 
+  const baseSha = github.context.payload.pull_request?.base.sha;
+
+  if (!baseSha) {
+    core.setFailed(
+      "Please find base SHA, please make sure you are running in a PR context"
+    );
+    return;
+  }
+
   const octokit = github.getOctokit(githubToken);
 
   console.log("setting GitHub User");
@@ -77,14 +86,18 @@ async function fetchJsonFile(
 
   console.log("relevant packages:", relevantPackages);
 
-  // for (const package of relevantPackages) {
-  //   const oldPackageFile = await fetchJsonFile(githubToken!, {
-  //     owner: github.context.repo.owner,
-  //     repo: github.context.repo.repo,
-  //     path: filePath!,
-  //     ref: github.context.payload.pull_request,
-  //   });
-  // }
+  for (const pkg of relevantPackages) {
+    const oldPackageFile = await fetchJsonFile(githubToken!, {
+      ...github.context.repo,
+      path: pkg.relativePath,
+      ref: baseSha,
+    });
+
+    console.log({
+      prev: oldPackageFile,
+      current: pkg.packageJson,
+    });
+  }
 
   // const { data: changes } = await octokit.rest.git.getTree({
   //   ...github.context.repo,
