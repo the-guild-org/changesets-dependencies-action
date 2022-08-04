@@ -32356,8 +32356,8 @@ async function fetchJsonFile(pat, file) {
   const { packages } = await (0, import_get_packages.getPackages)(process.cwd());
   const relevantPaths = packages.map((p) => ({
     ...p,
-    absolutePath: `${p}/package.json`,
-    relativePath: import_path2.default.relative(process.cwd(), `${p}/package.json`)
+    absolutePath: `${p.dir}/package.json`,
+    relativePath: import_path2.default.relative(process.cwd(), `${p.dir}/package.json`)
   }));
   console.log("relevant:", relevantPaths);
   const { data: changes } = await octokit.rest.git.getTree({

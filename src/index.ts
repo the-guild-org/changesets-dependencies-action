@@ -70,8 +70,8 @@ async function fetchJsonFile(
   const { packages } = await getPackages(process.cwd());
   const relevantPaths = packages.map((p) => ({
     ...p,
-    absolutePath: `${p}/package.json`,
-    relativePath: path.relative(process.cwd(), `${p}/package.json`),
+    absolutePath: `${p.dir}/package.json`,
+    relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
   }));
 
   console.log("relevant:", relevantPaths);
