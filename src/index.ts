@@ -5,7 +5,7 @@ import fetch from "node-fetch";
 import { getPackages } from "@manypkg/get-packages";
 import path from "path";
 import { PackageJSON } from "@changesets/types";
-import { diff } from "json-diff-ts";
+import { diff, IChange } from "json-diff-ts";
 
 async function fetchFile(
   pat: string,
@@ -88,6 +88,14 @@ async function fetchJsonFile(
 
   console.log("relevant packages:", relevantPackages);
 
+  const changes = new Map<
+    string,
+    {
+      dependencies: IChange[];
+      peerDependencies: IChange[];
+    }
+  >();
+
   for (const pkg of relevantPackages) {
     const oldPackageFile = (await fetchJsonFile(githubToken!, {
       ...github.context.repo,
@@ -96,17 +104,33 @@ async function fetchJsonFile(
     })) as PackageJSON;
 
     if (oldPackageFile) {
-      const dependenciesDiff = diff(
+      if (!changes.has(pkg.packageJson.name)) {
+        changes.set(pkg.packageJson.name, {
+          dependencies: [],
+          peerDependencies: [],
+        });
+      }
+
+      changes.get(pkg.packageJson.name)!.dependencies = diff(
         oldPackageFile.dependencies || {},
         pkg.packageJson.dependencies || {}
       );
-
-      console.log(dependenciesDiff);
+      changes.get(pkg.packageJson.name)!.peerDependencies = diff(
+        oldPackageFile.peerDependencies || {},
+        pkg.packageJson.peerDependencies || {}
+      );
     } else {
       core.warning(
         `Failed to locate previous file content of ${pkg.relativePath}, skipping ${pkg.packageJson.name}...`
       );
     }
+  }
+
+  for (const [key, value] of changes) {
+    console.log({
+      key,
+      value,
+    });
   }
 
   // const { data: changes } = await octokit.rest.git.getTree({

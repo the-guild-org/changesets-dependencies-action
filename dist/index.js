@@ -38300,6 +38300,7 @@ async function fetchJsonFile(pat, file) {
     relativePath: import_path2.default.relative(process.cwd(), `${p.dir}/package.json`)
   }));
   console.log("relevant packages:", relevantPackages);
+  const changes = /* @__PURE__ */ new Map();
   for (const pkg of relevantPackages) {
     const oldPackageFile = await fetchJsonFile(githubToken, {
       ...github.context.repo,
@@ -38307,16 +38308,31 @@ async function fetchJsonFile(pat, file) {
       ref: baseSha
     });
     if (oldPackageFile) {
-      const dependenciesDiff = (0, import_json_diff_ts.diff)(
+      if (!changes.has(pkg.packageJson.name)) {
+        changes.set(pkg.packageJson.name, {
+          dependencies: [],
+          peerDependencies: []
+        });
+      }
+      changes.get(pkg.packageJson.name).dependencies = (0, import_json_diff_ts.diff)(
         oldPackageFile.dependencies || {},
         pkg.packageJson.dependencies || {}
       );
-      console.log(dependenciesDiff);
+      changes.get(pkg.packageJson.name).peerDependencies = (0, import_json_diff_ts.diff)(
+        oldPackageFile.peerDependencies || {},
+        pkg.packageJson.peerDependencies || {}
+      );
     } else {
       core.warning(
         `Failed to locate previous file content of ${pkg.relativePath}, skipping ${pkg.packageJson.name}...`
       );
     }
+  }
+  for (const [key, value] of changes) {
+    console.log({
+      key,
+      value
+    });
   }
 })().catch((err) => {
   console.error(err);
