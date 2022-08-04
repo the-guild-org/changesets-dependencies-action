@@ -209,9 +209,7 @@ ${changeset.summary}
     );
   }
 
-  await gitUtils.push(branch, {
-    force: true,
-  });
+  await gitUtils.push();
 })().catch((err) => {
   console.error(err);
   core.setFailed(err.message);

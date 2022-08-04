@@ -43748,9 +43748,12 @@ var import_exec2 = __toESM(require_exec());
 var push = async (branch, { force } = {}) => {
   await (0, import_exec2.exec)(
     "git",
-    ["push", "origin", `HEAD:${branch}`, force && "--force"].filter(
-      Boolean
-    )
+    [
+      "push",
+      "origin",
+      branch ? `HEAD:${branch}` : void 0,
+      force && "--force"
+    ].filter(Boolean)
   );
 };
 var switchToMaybeExistingBranch = async (branch) => {
@@ -43909,9 +43912,7 @@ ${changeset.summary}
       `chore(dependencies): updated changesets for modified dependencies`
     );
   }
-  await push(branch, {
-    force: true
-  });
+  await push();
 })().catch((err) => {
   console.error(err);
   core.setFailed(err.message);

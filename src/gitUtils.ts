@@ -15,14 +15,17 @@ export const pullBranch = async (branch: string) => {
 };
 
 export const push = async (
-  branch: string,
+  branch?: string,
   { force }: { force?: boolean } = {}
 ) => {
   await exec(
     "git",
-    ["push", "origin", `HEAD:${branch}`, force && "--force"].filter<string>(
-      Boolean as any
-    )
+    [
+      "push",
+      "origin",
+      branch ? `HEAD:${branch}` : undefined,
+      force && "--force",
+    ].filter<string>(Boolean as any)
   );
 };
 
