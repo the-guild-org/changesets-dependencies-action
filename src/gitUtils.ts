@@ -11,7 +11,7 @@ export const setupUser = async () => {
 };
 
 export const pullBranch = async (branch: string) => {
-  await exec("git", ["pull", "origin", branch]);
+  await exec("git", ["pull", "origin", "--rebase", branch]);
 };
 
 export const push = async (
