@@ -185,12 +185,14 @@ async function fetchJsonFile(
     const filePath = path.resolve(changesetBase, `${key}-dependencies.md`);
 
     const changesetContents = `---
-    ${changeset.releases
-      .map((release) => `"${release.name}": ${release.type}`)
-      .join("\n")}
-    ---
-    
-    ${changeset.summary}
+${changeset.releases
+  .map((release) => `"${release.name}": ${release.type}`)
+  .join("\n")}
+---
+
+### Dependencies Updates
+
+${changeset.summary}
 `;
 
     console.debug(`Writing changeset to ${filePath}`, changesetContents);
