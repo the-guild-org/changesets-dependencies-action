@@ -12,7 +12,7 @@ import * as gitUtils from "./gitUtils";
 import sanitize from "sanitize-filename";
 
 function textify(d: IChange, location: string) {
-  const link = `([\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
+  const link = `[\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value})`;
 
   switch (d.type) {
     case Operation.ADD: {

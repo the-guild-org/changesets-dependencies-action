@@ -43849,7 +43849,7 @@ var checkIfClean = async () => {
 // src/index.ts
 var import_sanitize_filename = __toESM(require_sanitize_filename());
 function textify(d, location) {
-  const link = `([\`${d.key}@${d.value}\` \u2197\uFE0E](https://www.npmjs.com/package/${d.key}/v/${d.value}))`;
+  const link = `[\`${d.key}@${d.value}\` \u2197\uFE0E](https://www.npmjs.com/package/${d.key}/v/${d.value})`;
   switch (d.type) {
     case import_json_diff_ts.Operation.ADD: {
       return `Added dependency ${link} (to \`${location}\`)`;
