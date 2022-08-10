@@ -181,7 +181,7 @@ async function fetchJsonFile(
     });
     const filePath = path.resolve(
       changesetBase,
-      `${cleanName}-dependencies.md`
+      `${cleanName}-${issueContext.number}-dependencies.md`
     );
 
     if (changes.length === 0) {
@@ -210,7 +210,7 @@ ${changeset.releases
   .join("\n")}
 ---
 
-### Dependencies Updates
+dependencies updates: 
 
 ${changeset.summary}
 `;

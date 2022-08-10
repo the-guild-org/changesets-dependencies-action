@@ -43965,7 +43965,7 @@ async function fetchJsonFile(pat, file) {
     });
     const filePath = import_path3.default.resolve(
       changesetBase,
-      `${cleanName}-dependencies.md`
+      `${cleanName}-${issueContext.number}-dependencies.md`
     );
     if (changes2.length === 0) {
       const stats = await (0, import_fs_extra4.stat)(filePath).catch(() => null);
@@ -43987,7 +43987,7 @@ async function fetchJsonFile(pat, file) {
 ${changeset.releases.map((release) => `"${release.name}": ${release.type}`).join("\n")}
 ---
 
-### Dependencies Updates
+dependencies updates: 
 
 ${changeset.summary}
 `;
