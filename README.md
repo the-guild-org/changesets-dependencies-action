@@ -6,6 +6,13 @@ This action will automatically monitor all your PRs, and find changes in `packag
 
 > Works great with Renovate and dependabot!
 
+This Action only create Changeset files for the following:
+
+- Packages that are under the monorepo/Workspace and not being ignored. 
+- Packages that are not marked as `private: true`.
+- Packages that are located in `dependencies` or `peerDependencies`. 
+- Packages that are not ignored by `changesets` config.
+
 ## Usage
 
 Create a GitHub Actions workflow with the following:
@@ -27,3 +34,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
