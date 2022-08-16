@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
 
       - name: Create/Update Changesets
-        uses: "the-guild-org/changesets-dependencies-action@main"
+        uses: "the-guild-org/changesets-dependencies-action@v1.0.0"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
