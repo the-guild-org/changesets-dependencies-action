@@ -1,5 +1,5 @@
-name: RenovateChangesets
-description: A GitHub action to automate Changesets creation based on Renovate PRs
+name: ChangesetsDependencies
+description: A GitHub action to automate Changesets creation based on dependencies changes in `package.json` files.
 runs:
   using: "node16"
   main: "dist/index.js"
