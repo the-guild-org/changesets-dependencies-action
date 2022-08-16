@@ -8,18 +8,21 @@ import { PackageJSON } from "@changesets/types";
 import { diff, IChange, Operation } from "json-diff-ts";
 import { read, defaultConfig } from "@changesets/config";
 import { stat, mkdirp, writeFile, unlink } from "fs-extra";
-import * as gitUtils from "./gitUtils";
+import * as gitUtils from "./git-utils";
 import sanitize from "sanitize-filename";
+import { clean as cleanVersion } from "semver";
 
 function textify(d: IChange, location: string) {
-  const link = `[\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${d.key}/v/${d.value})`;
+  const link = `[\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${
+    d.key
+  }/v/${cleanVersion(d.value)})`;
 
   switch (d.type) {
     case Operation.ADD: {
       return `Added dependency ${link} (to \`${location}\`)`;
     }
     case Operation.UPDATE: {
-      return `Updated dependency ${link} (was \`${d.oldValue}\`, in \`${location}\`)`;
+      return `Updated dependency ${link} (from \`${d.oldValue}\`, in \`${location}\`)`;
     }
     case Operation.REMOVE: {
       return `Removed dependency ${link} (from \`${location}\`)`;
@@ -65,7 +68,6 @@ async function fetchJsonFile(
 }
 
 (async () => {
-  // console.log("Git context:", JSON.stringify(github.context, null, 2));
   let githubToken = process.env.GITHUB_TOKEN;
 
   if (!githubToken) {
@@ -82,11 +84,7 @@ async function fetchJsonFile(
     return;
   }
 
-  const octokit = github.getOctokit(githubToken);
-
-  console.debug("setting GitHub User");
   await setupGitUser();
-  console.debug("setting GitHub credentials");
   await setupGitCredentials(githubToken);
 
   const issueContext = github.context.issue;
@@ -118,7 +116,10 @@ async function fetchJsonFile(
       relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
     }));
 
-  console.debug("relevant packages:", relevantPackages);
+  console.debug(
+    "found relevant packages to check:",
+    relevantPackages.map((v) => v.packageJson?.name || v.dir)
+  );
 
   const changes = new Map<
     string,
