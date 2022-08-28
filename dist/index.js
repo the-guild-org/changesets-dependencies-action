@@ -46166,7 +46166,8 @@ var checkIfClean = async () => {
 var import_sanitize_filename = __toESM(require_sanitize_filename());
 var import_semver2 = __toESM(require_semver3());
 function textify(d, location) {
-  const link = `[\`${d.key}@${d.value}\` \u2197\uFE0E](https://www.npmjs.com/package/${d.key}/v/${(0, import_semver2.clean)(d.value)})`;
+  var _a4;
+  const link = `[\`${d.key}@${d.value}\` \u2197\uFE0E](https://www.npmjs.com/package/${d.key}/v/${((_a4 = (0, import_semver2.coerce)(d.value)) == null ? void 0 : _a4.version) ?? d.value})`;
   switch (d.type) {
     case import_json_diff_ts.Operation.ADD: {
       return `Added dependency ${link} (to \`${location}\`)`;
