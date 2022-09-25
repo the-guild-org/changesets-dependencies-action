@@ -99,10 +99,13 @@ async function fetchJsonFile(
 
   if (!baseSha) {
     core.setFailed(
-      "Please find base SHA, please make sure you are running in a PR context"
+      "Failed to locate base SHA, please make sure you are running in a PR context"
     );
+
     return;
   }
+
+  console.debug(`Using base Git SHA for checking previous state: ${baseSha}`);
 
   await setupGitUser();
   await setupGitCredentials(githubToken);
@@ -110,7 +113,7 @@ async function fetchJsonFile(
   const issueContext = github.context.issue;
 
   if (!issueContext?.number) {
-    core.warning(`Failed to locate a PR associated with the Action context:`);
+    core.warning(`Failed to locate a PR associated with the Action context`);
     core.setFailed(`Failed to locate a PR associated with the Action context`);
 
     return;
