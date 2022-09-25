@@ -88,10 +88,12 @@ async function fetchJsonFile(
 ) {
   return await fetchFile(pat, file)
     .then(async (x) => {
+      const textBody = await x.text();
+
       try {
-        return await x.json();
+        return JSON.parse(textBody);
       } catch (e) {
-        console.warn(`Malformed JSON response from GitHub:`, await x.text());
+        console.warn(`Malformed JSON response from GitHub:`, textBody);
 
         throw e;
       }
