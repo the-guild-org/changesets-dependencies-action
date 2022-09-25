@@ -87,7 +87,15 @@ async function fetchJsonFile(
   }
 ) {
   return await fetchFile(pat, file)
-    .then((x) => x.json())
+    .then(async (x) => {
+      try {
+        return await x.json();
+      } catch (e) {
+        console.warn(`Malformed JSON response from GitHub:`, await x.text());
+
+        throw e;
+      }
+    })
     .catch((e) => {
       console.warn(`Failed to parse JSON file: `, file, e);
 
