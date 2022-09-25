@@ -11,6 +11,7 @@ import { stat, mkdirp, writeFile, unlink } from "fs-extra";
 import * as gitUtils from "./git-utils";
 import sanitize from "sanitize-filename";
 import { coerce as coerceVersion } from "semver";
+import prettier from "prettier";
 
 function textify(d: IChange, location: string) {
   const link = `[\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${
@@ -27,6 +28,25 @@ function textify(d: IChange, location: string) {
     case Operation.REMOVE: {
       return `Removed dependency ${link} (from \`${location}\`)`;
     }
+  }
+}
+
+async function tryPrettier(workdir: string, content: string): Promise<string> {
+  try {
+    const prettierConfig = await prettier.resolveConfig(workdir).catch((e) => {
+      console.warn(`Failed to load prettier config file (using default)`, e);
+
+      return {};
+    });
+
+    return prettier.format(content, {
+      ...prettierConfig,
+      parser: "yaml",
+    });
+  } catch (e) {
+    console.warn(`Failed to run prettier:`, e);
+
+    return content;
   }
 }
 
@@ -47,7 +67,11 @@ async function fetchFile(
       },
     }
   ).catch((err) => {
-    console.error(err);
+    console.error(
+      `Failed to file content from GitHub on a specific ref:`,
+      file,
+      err
+    );
 
     throw err;
   });
@@ -63,8 +87,22 @@ async function fetchJsonFile(
   }
 ) {
   return await fetchFile(pat, file)
-    .then((x) => x.json())
-    .catch(() => null);
+    .then(async (x) => {
+      const textBody = await x.text();
+
+      try {
+        return JSON.parse(textBody);
+      } catch (e) {
+        console.warn(`Malformed JSON response from GitHub:`, textBody);
+
+        throw e;
+      }
+    })
+    .catch((e) => {
+      console.warn(`Failed to parse JSON file: `, file, e);
+
+      return null;
+    });
 }
 
 (async () => {
@@ -79,10 +117,13 @@ async function fetchJsonFile(
 
   if (!baseSha) {
     core.setFailed(
-      "Please find base SHA, please make sure you are running in a PR context"
+      "Failed to locate base SHA, please make sure you are running in a PR context"
     );
+
     return;
   }
+
+  console.debug(`Using base Git SHA for checking previous state: ${baseSha}`);
 
   await setupGitUser();
   await setupGitCredentials(githubToken);
@@ -90,14 +131,15 @@ async function fetchJsonFile(
   const issueContext = github.context.issue;
 
   if (!issueContext?.number) {
-    core.warning(`Failed to locate a PR associated with the Action context:`);
+    core.warning(`Failed to locate a PR associated with the Action context`);
     core.setFailed(`Failed to locate a PR associated with the Action context`);
 
     return;
   }
 
-  const packages = await getPackages(process.cwd());
-  const changesetsConfig = await read(process.cwd(), packages).catch((e) => {
+  const workdir = process.cwd();
+  const packages = await getPackages(workdir);
+  const changesetsConfig = await read(workdir, packages).catch((e) => {
     console.warn(
       `Failed to read changesets config: ${e.message}, using default config...`
     );
@@ -113,7 +155,7 @@ async function fetchJsonFile(
     .map((p) => ({
       ...p,
       absolutePath: `${p.dir}/package.json`,
-      relativePath: path.relative(process.cwd(), `${p.dir}/package.json`),
+      relativePath: path.relative(workdir, `${p.dir}/package.json`),
     }));
 
   console.debug(
@@ -163,7 +205,7 @@ async function fetchJsonFile(
   await gitUtils.fetch();
   await gitUtils.switchToMaybeExistingBranch(branch);
 
-  const changesetBase = path.resolve(process.cwd(), ".changeset");
+  const changesetBase = path.resolve(workdir, ".changeset");
   await mkdirp(changesetBase).catch(() => null);
 
   for (const [key, value] of changes) {
@@ -218,7 +260,8 @@ ${changeset.summary}
 
     console.debug(`Writing changeset to ${filePath}`, changesetContents);
 
-    await writeFile(filePath, changesetContents);
+    const formattedOutput = await tryPrettier(workdir, changesetContents);
+    await writeFile(filePath, formattedOutput);
   }
 
   if (!(await gitUtils.checkIfClean())) {
