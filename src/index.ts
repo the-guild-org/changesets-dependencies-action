@@ -10,12 +10,12 @@ import { read, defaultConfig } from "@changesets/config";
 import { stat, mkdirp, writeFile, unlink } from "fs-extra";
 import * as gitUtils from "./git-utils";
 import sanitize from "sanitize-filename";
-import { clean as cleanVersion } from "semver";
+import { coerce as coerceVersion } from "semver";
 
 function textify(d: IChange, location: string) {
   const link = `[\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${
     d.key
-  }/v/${cleanVersion(d.value)})`;
+  }/v/${coerceVersion(d.value)?.version ?? d.value})`;
 
   switch (d.type) {
     case Operation.ADD: {
