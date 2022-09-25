@@ -67,7 +67,11 @@ async function fetchFile(
       },
     }
   ).catch((err) => {
-    console.error(err);
+    console.error(
+      `Failed to file content from GitHub on a specific ref:`,
+      file,
+      err
+    );
 
     throw err;
   });
@@ -84,7 +88,11 @@ async function fetchJsonFile(
 ) {
   return await fetchFile(pat, file)
     .then((x) => x.json())
-    .catch(() => null);
+    .catch((e) => {
+      console.warn(`Failed to parse JSON file: `, file, e);
+
+      return null;
+    });
 }
 
 (async () => {
