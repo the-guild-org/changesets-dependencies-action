@@ -70,3 +70,7 @@ jobs:
 ```
 
 > The created commit will still appear as `github-actions-bot`, but this time it will run CI ;)
+
+### Inputs
+
+You may also set `preCommit` configuration with a custom script, if you wish to run a script before committing the actual files. This is useful if you want to run custom liting/prettier workflows.

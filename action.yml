@@ -3,6 +3,10 @@ description: A GitHub action to automate Changesets creation based on dependenci
 runs:
   using: "node16"
   main: "dist/index.js"
+inputs:
+  preCommit:
+    description: "A script to run before committing the changesets files"
+    required: false
 branding:
   icon: "package"
   color: "blue"

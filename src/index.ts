@@ -12,6 +12,7 @@ import * as gitUtils from "./git-utils";
 import sanitize from "sanitize-filename";
 import { coerce as coerceVersion } from "semver";
 import prettier from "prettier";
+import { exec } from "@actions/exec";
 
 function textify(d: IChange, location: string) {
   const link = `[\`${d.key}@${d.value}\` ↗︎](https://www.npmjs.com/package/${
@@ -262,6 +263,18 @@ ${changeset.summary}
 
     const formattedOutput = await tryPrettier(workdir, changesetContents);
     await writeFile(filePath, formattedOutput);
+  }
+
+  const preCommit = core.getInput("preCommit");
+
+  if (preCommit) {
+    core.debug(`Running pre commit script: ${preCommit}`);
+    console.log(`Running script: "${preCommit}"`);
+
+    const [command, ...args] = preCommit.split(" ");
+    await exec(command, args || [], {
+      cwd: workdir,
+    });
   }
 
   if (!(await gitUtils.checkIfClean())) {
