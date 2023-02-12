@@ -250,7 +250,7 @@ async function fetchJsonFile(
 
     const changesetContents = `---
 ${changeset.releases
-  .map((release) => `"${release.name}": ${release.type}`)
+  .map((release) => `'${release.name}': ${release.type}`)
   .join("\n")}
 ---
 
