@@ -32,6 +32,14 @@ function textify(d: IChange, location: string) {
   }
 }
 
+function isRelevantChange(change: IChange): boolean {
+  if (change.value === "workspace:*") {
+    return false;
+  }
+
+  return true;
+}
+
 async function tryPrettier(workdir: string, content: string): Promise<string> {
   try {
     const prettierConfig = await prettier.resolveConfig(workdir).catch((e) => {
@@ -211,8 +219,12 @@ async function fetchJsonFile(
 
   for (const [key, value] of changes) {
     const changes = [
-      ...value.dependencies.map((d) => textify(d, "dependencies")),
-      ...value.peerDependencies.map((d) => textify(d, "peerDependencies")),
+      ...value.dependencies
+        .filter(isRelevantChange)
+        .map((d) => textify(d, "dependencies")),
+      ...value.peerDependencies
+        .filter(isRelevantChange)
+        .map((d) => textify(d, "peerDependencies")),
     ].map((t) => `- ${t}`);
 
     console.debug("package update summary", {
