@@ -157,9 +157,8 @@ async function fetchJsonFile(
   });
   const relevantPackages = packages.packages
     .filter(
-      (pkg) =>
-        !changesetsConfig.ignore.includes(pkg.packageJson.name) &&
-        !pkg.packageJson.private
+      (pkg) => !changesetsConfig.ignore.includes(pkg.packageJson.name) // &&
+      // !pkg.packageJson.private
     )
     .map((p) => ({
       ...p,
